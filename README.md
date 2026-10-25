@@ -2,7 +2,9 @@
 
 按「永续提款」口径估算财富自由所需资产：不工作、按当前开支生活，本金不缩水、购买力不下降。
 
-计算方法取自 B 站「小Lin说」的相关视频，本仓库是把它做成了可直接使用的计算器，并对参考数据做了核对与补充。
+计算方法取自 B 站「小Lin说」的相关视频：<https://www.bilibili.com/video/BV1yUHP6rEYD/>
+
+本仓库只是把它做成了可直接使用的计算器，并未改变其核心逻辑；参考数据另做了核对与补充（见下方「参考值来源」）。**建议先看原视频再使用本工具**，口径的来龙去脉在视频里讲得更完整。
 
 单文件静态页面，零依赖，离线可用。打开 `index.html` 即可。
 
@@ -52,3 +54,9 @@
 仓库已含 GitHub Pages 工作流（`.github/workflows/pages.yml`），推送到 `main` 后自动发布到 `https://zdzengzz.github.io/Financial-Freedom-Calculator/`。
 
 工作流首次运行时会自动开启 Pages（`configure-pages` 的 `enablement: true`）。若因权限失败，手动到仓库 **Settings → Pages → Source** 选 **GitHub Actions** 即可。
+
+## 版权与来源
+
+- **计算方法与「480 倍」这一结论**来自 B 站 UP 主 **小Lin说** 的视频：<https://www.bilibili.com/video/BV1yUHP6rEYD/> 。版权归原作者所有，本仓库仅作学习与工具化实现，不主张该方法的所有权。
+- **本仓库新增的部分**：可交互的网页实现（`index.html`）、参考数据的核对与城市级补充、以及口径陷阱的整理。
+- 如果你要转载或引用，请同时注明原视频来源。
