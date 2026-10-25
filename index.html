@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>财富自由计算器 · 480 倍临界值</title>
+<meta name="description" content="按永续提款口径算清楚：不工作、本金不缩水，你需要多少资产。输入月开支、育儿、健康、住房，实时出临界值、缺口和覆盖率。">
+<meta name="theme-color" content="#0C447C">
+<meta property="og:type" content="website">
+<meta property="og:title" content="财富自由计算器 · 480 倍临界值">
+<meta property="og:description" content="不工作、本金不缩水，你需要多少资产？输入月开支即算，含北上广深参考值。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230C447C'/%3E%3Ctext x='16' y='23' font-size='17' font-family='sans-serif' font-weight='700' fill='%23fff' text-anchor='middle'%3E%E4%B8%87%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --ink:#16181d; --ink2:#4c5157; --muted:#82878f;
+    --line:#e3e6ea; --line2:#cfd4da;
+    --bg:#f6f7f9; --card:#fff;
+    --navy:#0C447C; --teal:#12785c; --red:#A32D2D;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; padding:28px 18px 48px; background:var(--bg); color:var(--ink);
+    font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:980px;margin:0 auto}
+  h1{font-size:22px;font-weight:600;margin:0 0 4px;letter-spacing:-.3px}
+  .lead{color:var(--muted);font-size:13px;margin:0 0 22px}
+
+  .layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:16px;align-items:start}
+  @media(max-width:860px){ .layout{grid-template-columns:minmax(0,1fr)} }
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+  .card h2{font-size:12.5px;font-weight:600;color:var(--muted);margin:0 0 14px;
+           letter-spacing:.6px;text-transform:uppercase}
+
+  .field{margin-bottom:15px}
+  .field:last-child{margin-bottom:0}
+  .field label{display:block;font-size:13px;color:var(--ink2);margin:0 0 6px}
+  .field .unit{color:var(--muted);font-size:12px}
+  .row{display:flex;align-items:center;gap:8px}
+  input[type=number]{
+    flex:1;min-width:0;padding:9px 11px;font-size:16px;font-weight:500;
+    border:1px solid var(--line2);border-radius:8px;background:#fff;color:var(--ink);
+    font-variant-numeric:tabular-nums;font-family:inherit;
+  }
+  input[type=number]:focus{outline:2px solid var(--navy);outline-offset:-1px;border-color:var(--navy)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+  .chip-lab{flex:0 0 100%;font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:-2px}
+  .chip{font-size:11.5px;padding:2px 9px;border-radius:20px;border:1px solid var(--line2);
+        background:#fff;color:var(--ink2);cursor:pointer;font-family:inherit;line-height:1.7}
+  .chip:hover{border-color:var(--navy);color:var(--navy);background:#f4f8fd}
+  .chip.hi{border-color:#9fbfdc}
+
+  .hero{background:var(--navy);border-radius:12px;padding:22px 24px;color:#fff;margin-bottom:12px}
+  .hero .lab{font-size:12.5px;opacity:.8;margin:0 0 4px}
+  .hero .big{font-size:40px;font-weight:600;line-height:1.1;letter-spacing:-1.5px;margin:0;
+             font-variant-numeric:tabular-nums}
+  .hero .sub{font-size:12.5px;opacity:.78;margin:9px 0 0}
+
+  .mini{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+  .mini div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .mini .k{display:block;font-size:12px;color:var(--muted);margin-bottom:3px}
+  .mini .v{display:block;font-size:19px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.4px}
+  .v-red{color:var(--red)} .v-teal{color:var(--teal)} .v-navy{color:var(--navy)}
+
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  td{padding:7px 0;border-bottom:1px solid var(--line)}
+  tr:last-child td{border-bottom:none}
+  td:last-child{text-align:right;font-variant-numeric:tabular-nums;font-weight:500}
+  tr.total td{border-top:1px solid var(--line2);font-weight:600;padding-top:9px}
+
+  .hint{font-size:12px;color:var(--muted);line-height:1.7;margin:12px 0 0}
+  .hint b{color:var(--ink2);font-weight:500}
+  .btn{margin-top:14px;width:100%;padding:9px;font-size:13px;border:1px solid var(--line2);
+       background:#fff;border-radius:8px;cursor:pointer;color:var(--ink2);font-family:inherit}
+  .btn:hover{border-color:var(--navy);color:var(--navy)}
+  .foot{font-size:12px;color:var(--muted);line-height:1.85;margin-top:6px}
+  .foot a{color:var(--navy);text-decoration:none;border-bottom:1px solid #c3d5e8}
+  .foot a:hover{border-bottom-color:var(--navy)}
+
+  @media(max-width:520px){
+    .hero .big{font-size:32px}
+    .mini .v{font-size:17px}
+  }
+  @media(prefers-reduced-motion:reduce){ *{transition:none!important;animation:none!important} }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>财富自由计算器</h1>
+  <p class="lead">口径：永续——不工作、按此开支生活，<b>资产不缩水、购买力不降</b>。</p>
+
+  <div class="layout">
+
+    <div class="card">
+      <h2>输入</h2>
+
+      <div class="field">
+        <label for="X">每月生活开支 X <span class="unit">元（不含房贷、育儿、医疗、买房）</span></label>
+        <div class="row"><input type="number" id="X" step="500" min="0"></div>
+        <div class="chips">
+          <span class="chip-lab">人均消费支出，2025 年，元/月（总额口径：已含居住、医疗、育儿）</span>
+          <button type="button" class="chip" data-t="X" data-v="2456">全国 2456</button>
+          <button type="button" class="chip" data-t="X" data-v="2990">城镇 2990</button>
+          <button type="button" class="chip" data-t="X" data-v="4222">北京 4222</button>
+          <button type="button" class="chip" data-t="X" data-v="4564">上海 4564</button>
+          <button type="button" class="chip hi" data-t="X" data-v="4098">广州 4098</button>
+          <button type="button" class="chip hi" data-t="X" data-v="4462">深圳 4462</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="N">孩子数量 N</label>
+        <div class="row"><input type="number" id="N" step="1" min="0"></div>
+      </div>
+
+      <div class="field">
+        <label for="K">单孩育儿成本 K <span class="unit">万元（0-18 岁）</span></label>
+        <div class="row"><input type="number" id="K" step="1" min="0"></div>
+        <div class="chips">
+          <span class="chip-lab">0-18 岁，万元/孩（同一套「分段消费支出 + 教育加成」算法，城市值按 2021 支出基数）</span>
+          <button type="button" class="chip" data-t="K" data-v="58">全国 58</button>
+          <button type="button" class="chip" data-t="K" data-v="58.5">成都 58.5</button>
+          <button type="button" class="chip" data-t="K" data-v="66.7">城镇 66.7</button>
+          <button type="button" class="chip" data-t="K" data-v="90.2">北京 90.2</button>
+          <button type="button" class="chip hi" data-t="K" data-v="91.6">广州 91.6</button>
+          <button type="button" class="chip hi" data-t="K" data-v="95.7">深圳 95.7</button>
+          <button type="button" class="chip" data-t="K" data-v="101">上海 101</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="M">终身健康预留 M <span class="unit">万元</span></label>
+        <div class="row"><input type="number" id="M" step="5" min="0"></div>
+        <div class="chips">
+          <button type="button" class="chip" data-t="M" data-v="20">人均 20</button>
+          <button type="button" class="chip" data-t="M" data-v="30">二线 15-30</button>
+          <button type="button" class="chip" data-t="M" data-v="60">一线 30-60</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="H">住房投入 H <span class="unit">万元（已有房填 0）</span></label>
+        <div class="row"><input type="number" id="H" step="10" min="0"></div>
+      </div>
+
+      <div class="field">
+        <label for="r">实际回报率 <span class="unit">%（已扣除通胀）</span></label>
+        <div class="row"><input type="number" id="r" step="0.1" min="0.1"></div>
+        <div class="chips">
+          <button type="button" class="chip" data-t="r" data-v="2">2%</button>
+          <button type="button" class="chip" data-t="r" data-v="2.5">2.5%（视频）</button>
+          <button type="button" class="chip" data-t="r" data-v="3">3%</button>
+          <button type="button" class="chip" data-t="r" data-v="4">4%</button>
+          <button type="button" class="chip" data-t="r" data-v="8">8%</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="A">现有可投资资产 <span class="unit">万元</span></label>
+        <div class="row"><input type="number" id="A" step="1" min="0"></div>
+      </div>
+
+      <button type="button" class="btn" id="reset">清空全部</button>
+    </div>
+
+    <div>
+      <p class="hint" id="empty" style="display:none;margin:0 0 10px"></p>
+
+      <div class="hero">
+        <p class="lab">财富自由临界值</p>
+        <p class="big" id="need" aria-live="polite">—</p>
+        <p class="sub" id="multLine">—</p>
+      </div>
+
+      <div class="mini">
+        <div><span class="k">缺口</span><span class="v v-red" id="gap" aria-live="polite">—</span></div>
+        <div><span class="k">现有资产能覆盖</span><span class="v v-navy" id="cover" aria-live="polite">—</span></div>
+      </div>
+
+      <div class="card" style="margin-bottom:12px">
+        <h2>拆解</h2>
+        <table>
+          <tr><td>生活开支 × 乘数</td><td id="dLife">—</td></tr>
+          <tr><td>育儿 K × N</td><td id="dKid">—</td></tr>
+          <tr><td>终身健康 M</td><td id="dMed">—</td></tr>
+          <tr><td>住房 H</td><td id="dHouse">—</td></tr>
+          <tr class="total"><td>合计</td><td id="dTotal">—</td></tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <h2>反算：现有资产能花多少</h2>
+        <table>
+          <tr><td>每月可持续支出</td><td id="affordM" style="color:var(--teal)">—</td></tr>
+          <tr><td>折合每年</td><td id="affordY">—</td></tr>
+          <tr><td>资产每多 1 万元，每月可多花</td><td id="perWan">—</td></tr>
+        </table>
+        <p class="hint" id="affordNote"></p>
+      </div>
+
+      <p class="foot">
+        公式：<b>临界值 = 乘数 × 月开支 X + 单孩成本 K × N + 健康 M + 住房 H</b>，乘数 = 12 ÷ 实际回报率（2.5% 即 480 倍）。<br>
+        数据来源：X 的城市值为 2025 年居民人均消费支出（深圳 53,548 元、上海 54,765 元、北京 50,667 元、广州 49,177 元，均为年额 ÷ 12）；K 的全国/城镇取自《中国生育成本报告》，一线与成都按该报告同一算法（分段人均消费支出 + 教育加总）测算，支出基数为 2021 年，故低于 2026 年口径下的通行值。<br>
+        口径提醒：X 的 chips 是<b>人均、且含居住医疗育儿的总额</b>——填进 X 后 K、M、H 应清零，并按家庭人口放大（三口之家约 ×2.5），否则重复计算。
+      </p>
+    </div>
+
+  </div>
+</main>
+
+<script>
+(function(){
+  "use strict";
+
+  var ZERO = {X:0, N:0, K:0, M:0, H:0, r:0, A:0};
+  var DEF  = {X:0, N:0, K:0, M:0, H:0, r:0, A:0};
+
+  function $(id){ return document.getElementById(id); }
+
+  function fmt(v){            // v: 元 -> 万元展示
+    var w = v / 1e4, a = Math.abs(w);
+    if (a >= 100) return Math.round(w).toLocaleString("zh-CN") + " 万";
+    if (a >= 20)  return String(parseFloat(w.toFixed(1))) + " 万";
+    return String(parseFloat(w.toFixed(2))) + " 万";
+  }
+  function yuan(v){
+    if (Math.abs(v) >= 1e4) return fmt(v);
+    return Math.round(v).toLocaleString("zh-CN") + " 元";
+  }
+
+  function read(){
+    ["X","N","K","M","H","r","A"].forEach(function(id){
+      var v = parseFloat($(id).value);
+      if (isNaN(v) || v < 0) v = 0;
+      DEF[id] = (id === "N") ? Math.floor(v) : v;
+    });
+  }
+
+  var OUT = ["need","multLine","gap","cover","dLife","dKid","dMed","dHouse",
+             "dTotal","affordM","affordY","perWan","affordNote"];
+
+  function blank(msg){                     // 输入不足：清空结果，只给一句引导
+    OUT.forEach(function(id){ $(id).textContent = "—"; });
+    $("multLine").textContent = "";
+    $("affordNote").textContent = "";
+    $("gap").className = "v v-navy";
+    $("cover").className = "v v-navy";
+    $("empty").textContent = msg;
+    $("empty").style.display = "";
+  }
+
+  function calc(){
+    read();
+
+    var base = DEF.X > 0 || DEF.K > 0 || DEF.M > 0 || DEF.H > 0;
+    if (!base){
+      blank("先填「每月生活开支 X」——这是唯一的必填项。其余可留 0。");
+      return;
+    }
+    if (DEF.r <= 0){
+      blank("还差一个实际回报率。填 2.5% 就是视频那套 480 倍口径，或点下面的百分比。");
+      return;
+    }
+    $("empty").style.display = "none";
+
+    var mult  = 12 / (DEF.r / 100);
+    var life  = mult * DEF.X;
+    var kid   = DEF.K * 1e4 * DEF.N;
+    var med   = DEF.M * 1e4;
+    var house = DEF.H * 1e4;
+    var need  = life + kid + med + house;
+
+    var assets = DEF.A * 1e4;
+    var gap    = Math.max(0, need - assets);
+    var cover  = need > 0 ? assets / need * 100 : 0;
+
+    /* 主结果 */
+    $("need").textContent = fmt(need);
+    $("multLine").textContent = "乘数 " + String(parseFloat(mult.toFixed(1))) + " 倍（12 ÷ "
+      + String(parseFloat((DEF.r).toFixed(2))) + "%）　·　月开支 " + yuan(DEF.X);
+
+    /* 缺口 / 覆盖 */
+    $("gap").textContent = gap > 0 ? fmt(gap) : "已达标";
+    $("gap").className = "v " + (gap > 0 ? "v-red" : "v-teal");
+    $("cover").textContent = cover.toFixed(1) + "%";
+    $("cover").className = "v " + (cover >= 100 ? "v-teal" : "v-navy");
+
+    /* 拆解 */
+    $("dLife").textContent  = fmt(life);
+    $("dKid").textContent   = fmt(kid);
+    $("dMed").textContent   = fmt(med);
+    $("dHouse").textContent = fmt(house);
+    $("dTotal").textContent = fmt(need);
+
+    /* 反算 */
+    var fixed = kid + med + house;
+    var left  = assets - fixed;
+    var affordM = left > 0 ? left / mult : 0;
+
+    $("affordM").textContent = Math.round(affordM).toLocaleString("zh-CN") + " 元 / 月";
+    $("affordY").textContent = yuan(affordM * 12);
+    $("perWan").textContent  = Math.round(1e4 / mult).toLocaleString("zh-CN") + " 元 / 月";
+
+    var note;
+    if (left <= 0){
+      note = "现有资产还不足以覆盖育儿、健康、住房这些固定项，暂时没有任何可支配的永久现金流。";
+    } else if (affordM < DEF.X){
+      note = "按当前资产可每月永久支出 " + Math.round(affordM).toLocaleString("zh-CN")
+           + " 元，低于你填的月开支 " + Math.round(DEF.X).toLocaleString("zh-CN")
+           + " 元，差 " + Math.round(DEF.X - affordM).toLocaleString("zh-CN") + " 元。";
+    } else {
+      note = "按当前资产可每月永久支出 " + Math.round(affordM).toLocaleString("zh-CN")
+           + " 元，已覆盖你填的月开支 " + Math.round(DEF.X).toLocaleString("zh-CN") + " 元。";
+    }
+    $("affordNote").textContent = note;
+  }
+
+  function fill(){
+    ["X","N","K","M","H","r","A"].forEach(function(id){ $(id).value = DEF[id]; });
+  }
+
+  ["X","N","K","M","H","r","A"].forEach(function(id){
+    $(id).addEventListener("input", calc);
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll(".chip"), function(btn){
+    btn.addEventListener("click", function(){
+      $(btn.dataset.t).value = btn.dataset.v;
+      calc();
+    });
+  });
+
+  $("reset").addEventListener("click", function(){
+    DEF = {X:ZERO.X, N:ZERO.N, K:ZERO.K, M:ZERO.M, H:ZERO.H, r:ZERO.r, A:ZERO.A};
+    fill(); calc();
+    $("X").focus();
+  });
+
+  fill();
+  calc();
+})();
+</script>
+</body>
+</html>
