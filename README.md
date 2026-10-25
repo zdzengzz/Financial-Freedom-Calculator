@@ -9,6 +9,7 @@
 单文件静态页面（`FFC.html`），零依赖，离线可用。打开 `FFC.html` 即可。
 
 手机端按下图找到入口打开（示意图）：
+
 <img width="300" alt="手机端打开入口示意" src="https://github.com/user-attachments/assets/639bf8ed-7a7a-465d-847e-8f6c7aefa66e">
 
 
