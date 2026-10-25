@@ -8,8 +8,9 @@
 
 单文件静态页面（`FFC.html`），零依赖，离线可用。打开 `FFC.html` 即可。
 
-手机端点击此处：
-<img width="1269" height="2648" alt="图片" src="https://github.com/user-attachments/assets/639bf8ed-7a7a-465d-847e-8f6c7aefa66e" />
+手机端按下图找到入口打开（示意图）：
+<img width="300" alt="手机端打开入口示意" src="https://github.com/user-attachments/assets/639bf8ed-7a7a-465d-847e-8f6c7aefa66e">
+
 
 ## 怎么用
 
