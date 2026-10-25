@@ -8,6 +8,9 @@
 
 单文件静态页面（`FFC.html`），零依赖，离线可用。打开 `FFC.html` 即可。
 
+手机端点击此处：
+<img width="1269" height="2648" alt="图片" src="https://github.com/user-attachments/assets/639bf8ed-7a7a-465d-847e-8f6c7aefa66e" />
+
 ## 怎么用
 
 所有输入默认是 `0`，从你要算的那一项开始填：
